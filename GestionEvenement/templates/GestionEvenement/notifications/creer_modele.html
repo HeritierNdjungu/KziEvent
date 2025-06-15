@@ -1,0 +1,32 @@
+{% extends 'GestionEvenement/base.html' %}
+
+{% block title %}Créer un modèle de notification - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Créer un modèle de notification</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre du modèle</label>
+                            <input type="text" class="form-control" id="titre" name="titre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contenu" class="form-label">Contenu du modèle</label>
+                            <textarea class="form-control" id="contenu" name="contenu" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Créer le modèle</button>
+                        <a href="{% url 'GestionEvenement:gestion_notifications' %}" class="btn btn-secondary ms-2">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

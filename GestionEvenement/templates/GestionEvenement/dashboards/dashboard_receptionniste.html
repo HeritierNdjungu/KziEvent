@@ -1,0 +1,194 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Réceptionniste - {{ block.super }}{% endblock %}
+
+{% block dashboard_title %}Tableau de Bord - Réceptionniste{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-house-door-fill me-2"></i> Vue d'Ensemble
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-person-check-fill me-2"></i> Accueil & Réservations
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-search me-2"></i> Consulter les Réservations
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-printer-fill me-2"></i> Imprimer Rapports
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-cash-coin me-2"></i> Valider Paiements Cash
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-upc-scan me-2"></i> Scanner les Billets
+    </a>
+    <a href="" class="list-group-item list-group-item-action " style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-person-fill me-2"></i> Mon Profil
+    </a>
+{% endblock dashboard_nav %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary">
+    <h1 class="h4 text-accent">Accueil et Gestion des Réservations</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="" class="btn btn-primary">
+            <i class="bi bi-upc-scan me-1"></i> Scanner un Billet
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, #0f3460, #1a1a2e);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Réservations Aujourd'hui</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ reservations_aujourdhui_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-calendar-day-fill fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="" class="text-white stretched-link small">Voir les réservations du jour <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, #e94560, #cf3e56);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Paiements Cash en Attente</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ paiements_cash_attente_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-hourglass-split fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="" class="text-white stretched-link small">Valider les paiements <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-dark);">
+        <h5 class="mb-0 text-white">Dernières Réservations Enregistrées</h5>
+        <div>
+            <a href="" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-list-ul me-1"></i> Voir Toutes
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-light">
+                        <th scope="col"># Réservation</th>
+                        <th scope="col">Événement</th>
+                        <th scope="col">Abonné</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Places</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in dernieres_reservations %}
+                    <tr class="text-light">
+                        <td>R{{ reservation.id|stringformat:"05d" }}</td>
+                        <td>{{ reservation.evenement.nom }}</td>
+                        <td>{{ reservation.abonne.user.get_full_name|default:reservation.abonne.user.username }}</td>
+                        <td>{{ reservation.date_reservation|date:"d M Y, H:i" }}</td>
+                        <td>{{ reservation.nombre_places }}</td>
+                        <td>
+                            {% if reservation.statut_reservation == "CONFIRMEE" %}
+                                <span class="badge bg-success">Confirmée</span>
+                            {% elif reservation.statut_reservation == "EN_ATTENTE" %}
+                                <span class="badge bg-warning text-dark">En Attente</span>
+                            {% elif reservation.statut_reservation == "ANNULEE" %}
+                                <span class="badge bg-danger">Annulée</span>
+                            {% elif reservation.statut_reservation == "PAYEE_CASH_ATTENTE_VALIDATION" %}
+                                <span class="badge bg-warning text-dark">Payée Cash (Attente)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="" class="btn btn-sm btn-outline-info me-1" title="Voir">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            {% if reservation.statut_reservation == "PAYEE_CASH_ATTENTE_VALIDATION" %}
+                            <a href="" class="btn btn-sm btn-outline-success me-1" title="Valider">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </a>
+                            {% endif %}
+                            <a href="" class="btn btn-sm btn-outline-primary" title="Imprimer">
+                                <i class="bi bi-printer-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="text-light">
+                        <td colspan="7" class="text-center">Aucune réservation récente à afficher.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Événements du Jour</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for evenement in evenements_jour %}
+                    <div class="list-group-item" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ evenement.nom }}</h6>
+                            <small>{{ evenement.date_debut|date:"H:i" }} - {{ evenement.date_fin|date:"H:i" }}</small>
+                        </div>
+                        <p class="mb-1 small">Lieu: {{ evenement.lieu }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>Places: {{ evenement.get_places_disponibles }} / {{ evenement.capacite }}</small>
+                            <a href="" class="btn btn-sm btn-outline-primary">Détails</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                        Aucun événement prévu aujourd'hui.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Actions Rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="" class="btn btn-primary">
+                        <i class="bi bi-upc-scan me-2"></i> Scanner un Billet
+                    </a>
+                    <a href="" class="btn btn-outline-light">
+                        <i class="bi bi-cash-coin me-2"></i> Valider les Paiements Cash
+                    </a>
+                    <a href="" class="btn btn-outline-light">
+                        <i class="bi bi-printer-fill me-2"></i> Imprimer les Rapports
+                    </a>
+                    <a href="" class="btn btn-outline-light">
+                        <i class="bi bi-search me-2"></i> Recherche Avancée
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock dashboard_content %}

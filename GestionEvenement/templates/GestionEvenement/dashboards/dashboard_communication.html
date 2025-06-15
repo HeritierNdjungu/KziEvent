@@ -1,0 +1,169 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Chargé de Communication - {{ block.super }}{% endblock %}
+
+{% block dashboard_title %}Tableau de Bord - Chargé de Communication{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="{% url 'GestionEvenement:dispatch_dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-house-door-fill me-2"></i> Vue d'Ensemble
+    </a>
+    <a href="{% url 'GestionEvenement:dashboard_communication' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'dashboard_communication' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-megaphone-fill me-2"></i> Communication & Publication
+    </a>
+    <a href="{% url 'GestionEvenement:liste_evenements_admin' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'liste_evenements_admin' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-card-list me-2"></i> Tous les Événements
+    </a>
+    <a href="{% url 'GestionEvenement:gestion_notifications' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'gestion_notifications' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-send-fill me-2"></i> Gérer les Notifications
+    </a>
+    <a href="{% url 'GestionEvenement:statistiques_communication' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'statistiques_communication' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-graph-up me-2"></i> Statistiques de Communication
+    </a>
+    <a href="{% url 'GestionEvenement:profil_personnel' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'mon_profil' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-person-fill me-2"></i> Mon Profil
+    </a>
+{% endblock dashboard_nav %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary">
+    <h1 class="h4 text-accent">Communication et Publication des Événements</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'GestionEvenement:notification_massive' %}" class="btn btn-primary">
+            <i class="bi bi-envelope-fill me-1"></i> Notification Massive
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, #0f3460, #1a1a2e);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Événements à Publier</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ evenements_a_publier_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-arrow-up-right-square-fill fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="{% url 'GestionEvenement:liste_evenements_admin' %}?statut=BROUILLON" class="text-white stretched-link small">Voir tous les événements à publier <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, #e94560, #cf3e56);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Notifications Envoyées (Mois)</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ notifications_mois_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-envelope-check-fill fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="{% url 'GestionEvenement:historique_notifications' %}" class="text-white stretched-link small">Voir l'historique des notifications <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--accent-dark);">
+        <h5 class="mb-0 text-white">Événements en Attente de Publication</h5>
+        <div>
+            <a href="{% url 'GestionEvenement:liste_evenements_admin' %}?statut=BROUILLON" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-list-ul me-1"></i> Voir Tous
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-light">
+                        <th scope="col">Nom de l'Événement</th>
+                        <th scope="col">Catégorie</th>
+                        <th scope="col">Date de Début</th>
+                        <th scope="col">Créé par</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evenement in evenements_a_publier %}
+                    <tr class="text-light">
+                        <td>{{ evenement.nom }}</td>
+                        <td>{{ evenement.categorie.nom_categorie|default:"Non catégorisé" }}</td>
+                        <td>{{ evenement.date_debut|date:"d M Y, H:i" }}</td>
+                        <td>{{ evenement.responsable_programmation.user.get_full_name|default:evenement.responsable_programmation.user.username }}</td>
+                        <td>
+                            <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="btn btn-sm btn-outline-info me-1" title="Voir">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="{% url 'GestionEvenement:publier_evenement' evenement.id %}" class="btn btn-sm btn-success" title="Publier">
+                                <i class="bi bi-megaphone-fill"></i> Publier
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="text-light">
+                        <td colspan="5" class="text-center">Aucun événement en attente de publication.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Dernières Notifications Envoyées</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for notification in dernieres_notifications %}
+                    <div class="list-group-item" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ notification.titre }}</h6>
+                            <small>{{ notification.date_envoi|date:"d M Y, H:i" }}</small>
+                        </div>
+                        <p class="mb-1 small">{{ notification.contenu|truncatechars:100 }}</p>
+                        <small>Envoyée à {{ notification.destinataires_count }} abonnés</small>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                        Aucune notification récente.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Actions Rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'GestionEvenement:notification_massive' %}" class="btn btn-primary">
+                        <i class="bi bi-envelope-fill me-2"></i> Envoyer une Notification Massive
+                    </a>
+                    <a href="{% url 'GestionEvenement:creer_modele_notification' %}" class="btn btn-outline-light">
+                        <i class="bi bi-file-earmark-text me-2"></i> Créer un Modèle de Notification
+                    </a>
+                    <a href="{% url 'GestionEvenement:statistiques_communication' %}" class="btn btn-outline-light">
+                        <i class="bi bi-graph-up me-2"></i> Voir les Statistiques
+                    </a>
+                    <a href="{% url 'GestionEvenement:gestion_abonnes' %}" class="btn btn-outline-light">
+                        <i class="bi bi-people-fill me-2"></i> Gérer les Abonnés
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock dashboard_content %} 

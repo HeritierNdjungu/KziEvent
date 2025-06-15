@@ -1,0 +1,135 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block title %}Créer un Événement - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h4 class="mb-0 text-white">Créer un Nouvel Événement</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="nom" class="form-label text-light">Nom de l'événement</label>
+                            <input type="text" class="form-control" id="nom" name="nom" value="{{ form_data.nom|default:'' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label text-light">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required>{{ form_data.description|default:'' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="date_debut" class="form-label text-light">Date de début</label>
+                                <input type="datetime-local" class="form-control" id="date_debut" name="date_debut" value="{{ form_data.date_debut|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="date_fin" class="form-label text-light">Date de fin</label>
+                                <input type="datetime-local" class="form-control" id="date_fin" name="date_fin" value="{{ form_data.date_fin|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lieu" class="form-label text-light">Lieu</label>
+                            <input type="text" class="form-control" id="lieu" name="lieu" value="{{ form_data.lieu|default:'' }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="capacite" class="form-label text-light">Capacité</label>
+                                <input type="number" class="form-control" id="capacite" name="capacite" min="1" value="{{ form_data.capacite|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="prix" class="form-label text-light">Prix</label>
+                                <input type="number" class="form-control" id="prix" name="prix" min="0" step="0.01" value="{{ form_data.prix|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="categorie" class="form-label text-light">Catégorie</label>
+                            <select class="form-control" id="categorie" name="categorie" required>
+                                <option value="">Sélectionnez une catégorie</option>
+                                {% for categorie in categories %}
+                                    <option value="{{ categorie.id }}" {% if form_data.categorie == categorie.id|stringformat:"i" %}selected{% endif %}>
+                                        {{ categorie.nom_categorie }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="mt-2">
+                                <a href="{% url 'GestionEvenement:ajouter_categorie' %}" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-plus-circle me-1"></i> Ajouter une catégorie
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="statut" class="form-label text-light">Statut</label>
+                            <select class="form-control" id="statut" name="statut" required>
+                                <option value="BROUILLON" {% if form_data.statut == 'BROUILLON' %}selected{% endif %}>Brouillon</option>
+                                <option value="PUBLIE" {% if form_data.statut == 'PUBLIE' %}selected{% endif %}>Publié</option>
+                                <option value="ANNULE" {% if form_data.statut == 'ANNULE' %}selected{% endif %}>Annulé</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label text-light">Image de l'événement</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Créer l'événement</button>
+                            <a href="{% url 'GestionEvenement:dashboard_programmation' %}" class="btn btn-outline-light">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validation des dates
+    const dateDebut = document.getElementById('date_debut');
+    const dateFin = document.getElementById('date_fin');
+
+    dateFin.addEventListener('change', function() {
+        if (dateDebut.value && dateFin.value) {
+            if (new Date(dateFin.value) <= new Date(dateDebut.value)) {
+                alert('La date de fin doit être postérieure à la date de début');
+                dateFin.value = '';
+            }
+        }
+    });
+
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+

@@ -1,0 +1,156 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Tableau de Bord - Chargé de Programmation - {{ block.super }}{% endblock %}
+
+{% block dashboard_title %}Tableau de Bord - Chargé de Programmation{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="{% url 'GestionEvenement:dispatch_dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'dispatch_dashboard' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-house-door-fill me-2"></i> Vue d'Ensemble
+    </a>
+    <a href="{% url 'GestionEvenement:dashboard_programmation' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'dashboard_programmation' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-calendar-plus-fill me-2"></i> Gestion des Événements
+    </a>
+    <a href="{% url 'GestionEvenement:liste_evenements_admin' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'liste_evenements_admin' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-card-list me-2"></i> Tous les Événements
+    </a>
+    <a href="{% url 'GestionEvenement:evenements_archives' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'evenements_archives' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-archive-fill me-2"></i> Événements Archivés
+    </a>
+    <a href="{% url 'GestionEvenement:gestion_categories' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'gestion_categories' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-tags-fill me-2"></i> Gestion des Catégories
+    </a>
+    <a href="{% url 'GestionEvenement:statistiques_evenements' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'statistiques_evenements' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-bar-chart-fill me-2"></i> Statistiques
+    </a>
+    <a href="{% url 'GestionEvenement:profil_personnel' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profil_personnel' %}active{% endif %}" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+        <i class="bi bi-person-fill me-2"></i> Mon Profil
+    </a>
+{% endblock dashboard_nav %}
+
+{% block dashboard_content %}
+<div class="row">
+    <!-- Statistiques -->
+    <div class="col-md-12 mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Événements Publiés</h6>
+                                <h2 class="mb-0">{{ evenements_publies_count }}</h2>
+                            </div>
+                            <i class="bi bi-calendar-check h1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Brouillons</h6>
+                                <h2 class="mb-0">{{ evenements_brouillon_count }}</h2>
+                            </div>
+                            <i class="bi bi-pencil-square h1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-secondary text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Événements Terminés</h6>
+                                <h2 class="mb-0">{{ evenements_termines_count }}</h2>
+                            </div>
+                            <i class="bi bi-calendar-x h1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="col-md-12 mb-4">
+        <div class="card" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Actions Rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'GestionEvenement:creer_evenement' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle-fill me-2"></i>Créer un Nouvel Événement
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'GestionEvenement:gestion_categories' %}" class="btn btn-info w-100">
+                            <i class="bi bi-tags-fill me-2"></i>Gérer les Catégories
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Événements récents -->
+    <div class="col-md-6 mb-4">
+        <div class="card" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Événements Récents</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for evenement in evenements_recents %}
+                        <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="list-group-item list-group-item-action" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ evenement.nom }}</h6>
+                                <small>{{ evenement.date_creation|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ evenement.description|truncatechars:100 }}</p>
+                            <small class="text-muted">Statut : {{ evenement.get_statut_display }}</small>
+                        </a>
+                    {% empty %}
+                        <div class="text-center text-muted py-3">
+                            Aucun événement récent
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Événements à venir -->
+    <div class="col-md-6 mb-4">
+        <div class="card" style="background-color: var(--secondary-dark); border: none;">
+            <div class="card-header" style="background-color: var(--accent-dark);">
+                <h5 class="mb-0 text-white">Événements à Venir</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for evenement in evenements_a_venir %}
+                        <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="list-group-item list-group-item-action" style="background-color: var(--secondary-dark); color: var(--text-light); border-color: var(--accent-dark);">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ evenement.nom }}</h6>
+                                <small>{{ evenement.date_debut|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ evenement.description|truncatechars:100 }}</p>
+                            <small class="text-muted">Capacité : {{ evenement.get_places_disponibles }}/{{ evenement.capacite }}</small>
+                        </a>
+                    {% empty %}
+                        <div class="text-center text-muted py-3">
+                            Aucun événement à venir
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

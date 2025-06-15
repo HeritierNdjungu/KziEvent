@@ -1,0 +1,152 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Gestion des Catégories - {{ block.super }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Formulaire de création -->
+        <div class="col-md-4 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Nouvelle Catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="nom" class="form-label text-light">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nom" name="nom" required
+                                   placeholder="Nom de la catégorie">
+                            <div class="invalid-feedback">
+                                Veuillez entrer un nom pour la catégorie.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label text-light">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                      placeholder="Description de la catégorie"></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Créer la Catégorie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des catégories -->
+        <div class="col-md-8">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Liste des Catégories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-light">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Description</th>
+                                    <th>Nombre d'Événements</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categorie in categories %}
+                                <tr>
+                                    <td>{{ categorie.nom_categorie }}</td>
+                                    <td>{{ categorie.description|default:"-" }}</td>
+                                    <td>{{ categorie.evenements_cat.count }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-warning" 
+                                                    data-bs-toggle="modal" data-bs-target="#editModal{{ categorie.id }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ categorie.id }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Modal de modification -->
+                                        <div class="modal fade" id="editModal{{ categorie.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content bg-dark">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title text-white">Modifier la Catégorie</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{% url 'GestionEvenement:modifier_categorie' categorie.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="nom{{ categorie.id }}" class="form-label text-light">Nom</label>
+                                                                <input type="text" class="form-control" id="nom{{ categorie.id }}" 
+                                                                       name="nom" value="{{ categorie.nom_categorie }}" required>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="description{{ categorie.id }}" class="form-label text-light">Description</label>
+                                                                <textarea class="form-control" id="description{{ categorie.id }}" 
+                                                                          name="description" rows="3">{{ categorie.description }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal de suppression -->
+                                        <div class="modal fade" id="deleteModal{{ categorie.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content bg-dark">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title text-white">Confirmer la Suppression</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="text-light">Êtes-vous sûr de vouloir supprimer la catégorie "{{ categorie.nom_categorie }}" ?</p>
+                                                        {% if categorie.evenements_cat.exists %}
+                                                        <div class="alert alert-warning mt-2">
+                                                            Attention : Cette catégorie contient {{ categorie.evenements_cat.count }} événement(s).
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                        <form action="{% url 'GestionEvenement:supprimer_categorie' categorie.id %}" method="post" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucune catégorie trouvée</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

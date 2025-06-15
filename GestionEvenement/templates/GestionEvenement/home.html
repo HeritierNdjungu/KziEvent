@@ -1,0 +1,418 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block title %}Accueil - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Section Hero avec Carrousel -->
+    <section class="hero-section mb-5">
+        <div id="heroCarousel" class="carousel slide carousel-fade shadow-lg rounded-3 overflow-hidden" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="hero-slide d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(rgba(15, 52, 96, 0.8), rgba(26, 26, 46, 0.9)), url('{% static 'GestionEvenement/images/Event02.png' %}') no-repeat center center; background-size: cover; height: 500px;">
+
+                    <div>
+                            <h1 class="display-4 fw-bold text-white mb-4">Bienvenue au Musée de  Kolwezi</h1>
+                            <p class="lead col-lg-8 mx-auto text-white mb-4">Explorez un monde d'art, d'histoire et de culture. Découvrez nos événements passionnants et réservez votre prochaine expérience inoubliable.</p>
+                            <div>
+                                <a href="#" class="btn btn-primary btn-lg me-2">Voir les Événements à Venir</a>
+                                <a href="#" class="btn btn-outline-secondary btn-lg">En Savoir Plus sur le Musée</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="hero-slide d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(rgba(15, 52, 96, 0.8), rgba(26, 26, 46, 0.9)), url('{% static 'GestionEvenement/images/Event01.jpg' %}') no-repeat center center; background-size: cover; height: 500px;">
+                        <div>
+                            <h1 class="display-4 fw-bold text-white mb-4">Expositions Artistiques</h1>
+                            <p class="lead col-lg-8 mx-auto text-white mb-4">Découvrez nos expositions d'art contemporain et traditionnel, mettant en valeur les talents locaux et internationaux.</p>
+                            <div>
+                                <a href="#" class="btn btn-primary btn-lg">Explorer les Expositions</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="hero-slide d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(rgba(15, 52, 96, 0.8), rgba(26, 26, 46, 0.9)), url('{% static 'GestionEvenement/images/Event01.jpg' %}') no-repeat center center; background-size: cover; height: 500px;">
+                        <div>
+                            <h1 class="display-4 fw-bold text-white mb-4">Ateliers et Activités</h1>
+                            <p class="lead col-lg-8 mx-auto text-white mb-4">Participez à nos ateliers interactifs pour tous les âges et plongez dans une expérience culturelle enrichissante.</p>
+                            <div>
+                                <a href="#" class="btn btn-primary btn-lg">Découvrir les Ateliers</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section Événements à la Une -->
+    <section class="py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-white">Événements à la Une</h2>
+                <div class="d-flex gap-2">
+                    <button id="prev-event" class="btn btn-outline-light">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button id="next-event" class="btn btn-outline-light">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="event-carousel owl-carousel">
+                {% for evenement in evenements_a_la_une %}
+                <div class="item">
+                    <div class="card h-100" style="background-color: var(--secondary-dark); border: none;">
+                        {% if evenement.image %}
+                        <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.nom }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-image text-light" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title text-white">{{ evenement.nom }}</h5>
+                            <p class="card-text text-light">{{ evenement.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ evenement.prix }} €</span>
+                                <small class="text-light">{{ evenement.lieu }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="btn btn-primary w-100">
+                                Voir les détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Aucun événement à la une pour le moment.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Événements à Venir -->
+    <section class="py-5 bg-dark">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-white">Événements à Venir</h2>
+                <div class="d-flex gap-2">
+                    <button id="prev-upcoming" class="btn btn-outline-light">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button id="next-upcoming" class="btn btn-outline-light">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="upcoming-carousel owl-carousel">
+                {% for evenement in evenements_a_venir %}
+                <div class="item">
+                    <div class="card h-100" style="background-color: var(--secondary-dark); border: none;">
+                        {% if evenement.image %}
+                        <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.nom }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-image text-light" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title text-white">{{ evenement.nom }}</h5>
+                            <p class="card-text text-light">{{ evenement.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ evenement.prix }} €</span>
+                                <small class="text-light">{{ evenement.lieu }}</small>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-light">
+                                    <i class="bi bi-calendar-event"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="btn btn-primary w-100">
+                                Voir les détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Aucun événement à venir pour le moment.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Catégories avec design amélioré -->
+    <section class="categories-section mb-5 p-4 rounded-3 shadow-lg" style="background: linear-gradient(135deg, var(--secondary-dark), var(--accent-dark));">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h3 class="display-6 text-white mb-3">Explorez par Catégories</h3>
+                <p class="lead text-light mb-4">Plongez dans nos collections et événements thématiques. Trouvez ce qui vous passionne.</p>
+                <a href="#" class="btn btn-light">Voir toutes les catégories</a>
+            </div>
+            <div class="col-md-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="category-card p-3 rounded text-center bg-secondary-dark shadow-sm">
+                            <i class="bi bi-palette-fill text-accent fs-1 mb-2"></i>
+                            <h5 class="text-white">Expositions d'Art</h5>
+                            <a href="#" class="stretched-link"></a>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="category-card p-3 rounded text-center bg-secondary-dark shadow-sm">
+                            <i class="bi bi-book-fill text-accent fs-1 mb-2"></i>
+                            <h5 class="text-white">Conférences Historiques</h5>
+                            <a href="#" class="stretched-link"></a>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="category-card p-3 rounded text-center bg-secondary-dark shadow-sm">
+                            <i class="bi bi-people-fill text-accent fs-1 mb-2"></i>
+                            <h5 class="text-white">Ateliers pour Enfants</h5>
+                            <a href="#" class="stretched-link"></a>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="category-card p-3 rounded text-center bg-secondary-dark shadow-sm">
+                            <i class="bi bi-calendar-event-fill text-accent fs-1 mb-2"></i>
+                            <h5 class="text-white">Tous les Événements</h5>
+                            <a href="#" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Témoignages -->
+    <section class="testimonials-section mb-5">
+        <h2 class="display-6 text-center mb-4 text-accent">Ce que disent nos visiteurs</h2>
+        <div class="owl-carousel testimonial-carousel">
+            <div class="item p-3">
+                <div class="testimonial-card p-4 rounded-3 shadow-sm" style="background-color: var(--secondary-dark);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="testimonial-avatar me-3">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Avatar" class="rounded-circle" width="60" height="60">
+                        </div>
+                        <div>
+                            <h5 class="mb-0 text-white">Marie Kabongo</h5>
+                            <p class="mb-0 small text-light">Visiteuse régulière</p>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-light fst-italic">"Les expositions sont toujours fascinantes et bien organisées. J'ai particulièrement apprécié l'atelier de peinture du mois dernier. Je recommande vivement ce musée !"</p>
+                </div>
+            </div>
+            <div class="item p-3">
+                <div class="testimonial-card p-4 rounded-3 shadow-sm" style="background-color: var(--secondary-dark);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="testimonial-avatar me-3">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Avatar" class="rounded-circle" width="60" height="60">
+                        </div>
+                        <div>
+                            <h5 class="mb-0 text-white">Jean Mutombo</h5>
+                            <p class="mb-0 small text-light">Enseignant</p>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-light fst-italic">"J'ai emmené mes élèves à la conférence sur l'histoire locale. C'était informatif et captivant. Le personnel est très accueillant et professionnel."</p>
+                </div>
+            </div>
+            <div class="item p-3">
+                <div class="testimonial-card p-4 rounded-3 shadow-sm" style="background-color: var(--secondary-dark);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="testimonial-avatar me-3">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Avatar" class="rounded-circle" width="60" height="60">
+                        </div>
+                        <div>
+                            <h5 class="mb-0 text-white">Sophie Lukusa</h5>
+                            <p class="mb-0 small text-light">Artiste</p>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-light fst-italic">"En tant qu'artiste, j'apprécie l'espace que le musée offre aux talents locaux. Les événements sont variés et enrichissants pour toute la communauté."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Newsletter -->
+    <section class="newsletter-section p-4 rounded-3 shadow-lg text-center mb-5" style="background: linear-gradient(45deg, var(--accent-dark), var(--secondary-dark));">
+        <h3 class="text-white mb-3">Restez informé de nos événements</h3>
+        <p class="text-light mb-4">Inscrivez-vous à notre newsletter pour recevoir les dernières actualités et invitations spéciales.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Votre adresse email" aria-label="Adresse email">
+                    <button class="btn btn-primary" type="button">S'abonner</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    $(document).ready(function(){
+        // Initialisation du carrousel d'événements à la une
+        var eventCarousel = $(".event-carousel").owlCarousel({
+            loop: true,
+            margin: 20,
+            nav: false,
+            dots: false,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            autoplayHoverPause: true,
+            responsive:{
+                0:{
+                    items:1
+                },
+                768:{
+                    items:2
+                },
+                992:{
+                    items:3
+                }
+            }
+        });
+        
+        // Boutons de navigation pour le carrousel d'événements à la une
+        $("#next-event").click(function(){
+            eventCarousel.trigger('next.owl.carousel');
+        });
+        $("#prev-event").click(function(){
+            eventCarousel.trigger('prev.owl.carousel');
+        });
+
+        // Initialisation du carrousel d'événements à venir
+        var upcomingCarousel = $(".upcoming-carousel").owlCarousel({
+            loop: true,
+            margin: 20,
+            nav: false,
+            dots: false,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            autoplayHoverPause: true,
+            responsive:{
+                0:{
+                    items:1
+                },
+                768:{
+                    items:2
+                },
+                992:{
+                    items:3
+                }
+            }
+        });
+        
+        // Boutons de navigation pour le carrousel d'événements à venir
+        $("#next-upcoming").click(function(){
+            upcomingCarousel.trigger('next.owl.carousel');
+        });
+        $("#prev-upcoming").click(function(){
+            upcomingCarousel.trigger('prev.owl.carousel');
+        });
+    });
+</script>
+
+<style>
+    /* Variables de couleur définies dans base.html */
+    .text-accent {
+        color: var(--accent-color) !important;
+    }
+    
+    .bg-accent {
+        background-color: var(--accent-color) !important;
+    }
+    
+    .bg-accent-dark {
+        background-color: var(--accent-dark) !important;
+    }
+    
+    .bg-secondary-dark {
+        background-color: var(--secondary-dark) !important;
+    }
+    
+    /* Styles pour les carrousels */
+    .owl-carousel .item {
+        transition: transform 0.3s ease;
+    }
+    
+    .owl-carousel .owl-item:hover .item {
+        transform: translateY(-5px);
+    }
+    
+    .owl-dots .owl-dot span {
+        background: var(--text-light);
+    }
+    
+    .owl-dots .owl-dot.active span {
+        background: var(--accent-color);
+    }
+    
+    /* Styles pour les cartes de catégorie */
+    .category-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Animation pour les témoignages */
+    .testimonial-card {
+        transition: all 0.3s ease;
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Styles pour le carrousel principal */
+    .carousel-item {
+        transition: transform 2s ease, opacity .5s ease-out;
+    }
+    
+    .carousel-control-prev, .carousel-control-next {
+        width: 5%;
+    }
+    
+    .carousel-indicators button {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}

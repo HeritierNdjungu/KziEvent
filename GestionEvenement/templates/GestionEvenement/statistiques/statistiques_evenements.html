@@ -1,0 +1,337 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Statistiques des Événements - {{ block.super }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-body">
+                    <h1 class="h3 mb-0 text-white">Statistiques des Événements</h1>
+                    <p class="text-light mb-0">Analysez les performances et la distribution de vos événements</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Total Événements</h6>
+                            <h2 class="mb-0">{{ total_evenements }}</h2>
+                        </div>
+                        <i class="bi bi-calendar-event h1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Événements Publiés</h6>
+                            <h2 class="mb-0">{{ evenements_publies }}</h2>
+                        </div>
+                        <i class="bi bi-check-circle h1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Brouillons</h6>
+                            <h2 class="mb-0">{{ evenements_brouillons }}</h2>
+                        </div>
+                        <i class="bi bi-pencil-square h1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Événements Annulés</h6>
+                            <h2 class="mb-0">{{ evenements_annules }}</h2>
+                        </div>
+                        <i class="bi bi-x-circle h1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row">
+        <!-- Répartition par catégorie -->
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Répartition par Catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Évolution mensuelle -->
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Évolution Mensuelle</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statut par catégorie -->
+        <div class="col-md-12 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Statut des Événements par Catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusByCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableaux de données -->
+    <div class="row">
+        <!-- Tableau des catégories -->
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Détails par Catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-light">
+                            <thead>
+                                <tr>
+                                    <th>Catégorie</th>
+                                    <th>Nombre d'événements</th>
+                                    <th>Publiés</th>
+                                    <th>Brouillons</th>
+                                    <th>Annulés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categorie in stats_categories %}
+                                <tr>
+                                    <td>{{ categorie.nom_categorie }}</td>
+                                    <td>{{ categorie.nombre_evenements }}</td>
+                                    <td>{{ categorie.evenements_publies }}</td>
+                                    <td>{{ categorie.evenements_brouillons }}</td>
+                                    <td>{{ categorie.evenements_annules }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau mensuel -->
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Évolution Mensuelle</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover text-light">
+                            <thead>
+                                <tr>
+                                    <th>Mois</th>
+                                    <th>Nombre d'événements</th>
+                                    <th>Publiés</th>
+                                    <th>Brouillons</th>
+                                    <th>Annulés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in stats_mensuelles %}
+                                <tr>
+                                    <td>{{ stat.mois|date:"F Y" }}</td>
+                                    <td>{{ stat.total }}</td>
+                                    <td>{{ stat.publies }}</td>
+                                    <td>{{ stat.brouillons }}</td>
+                                    <td>{{ stat.annules }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Données pour les graphiques
+const categoriesData = {{ categories_stats|safe }};
+const monthlyData = {{ monthly_stats|safe }};
+
+// Graphique de répartition par catégorie
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'pie',
+    data: {
+        labels: categoriesData.map(c => c.name),
+        datasets: [{
+            data: categoriesData.map(c => c.count),
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    color: '#fff'
+                }
+            }
+        }
+    }
+});
+
+// Graphique d'évolution mensuelle
+const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+new Chart(monthlyCtx, {
+    type: 'line',
+    data: {
+        labels: monthlyData.map(m => m.mois),
+        datasets: [{
+            label: 'Total des événements',
+            data: monthlyData.map(m => m.total),
+            borderColor: '#36A2EB',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#fff'
+                }
+            }
+        }
+    }
+});
+
+// Graphique de statut par catégorie
+const statusByCategoryCtx = document.getElementById('statusByCategoryChart').getContext('2d');
+new Chart(statusByCategoryCtx, {
+    type: 'bar',
+    data: {
+        labels: categoriesData.map(c => c.name),
+        datasets: [
+            {
+                label: 'Publiés',
+                data: categoriesData.map(c => c.published),
+                backgroundColor: '#28a745'
+            },
+            {
+                label: 'Brouillons',
+                data: categoriesData.map(c => c.draft),
+                backgroundColor: '#ffc107'
+            },
+            {
+                label: 'Annulés',
+                data: categoriesData.map(c => c.cancelled),
+                backgroundColor: '#dc3545'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: {
+                stacked: true,
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            y: {
+                stacked: true,
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#fff'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

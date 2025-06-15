@@ -1,0 +1,127 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block title %}Mes Billets - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-0">Mes Billets</h1>
+            <p class="text-muted">Gérez vos billets pour les événements à venir</p>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total des billets</h5>
+                    <p class="display-4">{{ billets_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des billets -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if reservations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Date</th>
+                                <th>Numéro de billet</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation in reservations %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'GestionEvenement:detail_evenement' reservation.evenement.id %}" class="text-decoration-none">
+                                            {{ reservation.evenement.titre }}
+                                        </a>
+                                    </td>
+                                    <td>{{ reservation.evenement.date_debut|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ reservation.numero_billet }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Valide</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'GestionEvenement:telecharger_billet_pdf' reservation.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-download"></i> Télécharger
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="visually-hidden">Plus d'options</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'GestionEvenement:envoyer_billet_email' reservation.id %}">
+                                                        <i class="bi bi-envelope"></i> Envoyer par email
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'GestionEvenement:ajouter_calendrier' reservation.id %}">
+                                                        <i class="bi bi-calendar-plus"></i> Ajouter au calendrier
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-ticket-perforated display-1 text-muted"></i>
+                    <h3 class="mt-3">Aucun billet disponible</h3>
+                    <p class="text-muted">Vous n'avez pas encore de billets pour les événements à venir.</p>
+                    <a href="{% url 'GestionEvenement:liste_evenements' %}" class="btn btn-primary">
+                        <i class="bi bi-calendar-event"></i> Voir les événements
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if evenements_a_venir %}
+        <!-- Événements à venir -->
+        <div class="row mt-5">
+            <div class="col">
+                <h2 class="h4 mb-4">Vos prochains événements</h2>
+                <div class="row">
+                    {% for evenement in evenements_a_venir %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                {% if evenement.image %}
+                                    <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ evenement.titre }}</h5>
+                                    <p class="card-text">
+                                        <i class="bi bi-calendar"></i> {{ evenement.date_debut|date:"d/m/Y H:i" }}
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="bi bi-geo-alt"></i> {{ evenement.lieu }}
+                                    </p>
+                                    <a href="{% url 'GestionEvenement:evenement_detail' evenement.pk %}" class="btn btn-outline-primary">
+                                        Plus d'informations
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

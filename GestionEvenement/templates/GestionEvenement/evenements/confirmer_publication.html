@@ -1,0 +1,46 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Publier l'Événement - {{ block.super }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-header" style="background-color: var(--accent-dark);">
+                    <h5 class="card-title mb-0 text-white">Confirmer la Publication</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-light">Êtes-vous sûr de vouloir publier l'événement "{{ evenement.nom }}" ?</p>
+                    <p class="text-light">Une fois publié, l'événement sera visible par tous les utilisateurs.</p>
+                    
+                    <!-- Récapitulatif de l'événement -->
+                    <div class="card bg-dark mb-3">
+                        <div class="card-body">
+                            <h6 class="text-light">Récapitulatif :</h6>
+                            <ul class="list-unstyled text-light">
+                                <li><strong>Date de début :</strong> {{ evenement.date_debut|date:"d/m/Y H:i" }}</li>
+                                <li><strong>Date de fin :</strong> {{ evenement.date_fin|date:"d/m/Y H:i" }}</li>
+                                <li><strong>Lieu :</strong> {{ evenement.lieu }}</li>
+                                <li><strong>Capacité :</strong> {{ evenement.capacite }} personnes</li>
+                                <li><strong>Prix :</strong> {{ evenement.prix }} €</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <form method="post" class="d-flex justify-content-end gap-2">
+                        {% csrf_token %}
+                        <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Confirmer la Publication
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

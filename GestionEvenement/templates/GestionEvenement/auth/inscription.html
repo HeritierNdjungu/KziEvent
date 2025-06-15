@@ -1,0 +1,114 @@
+{% extends "GestionEvenement/base.html" %}
+
+{% block title %}Inscription - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Inscription</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <h4 class="mb-3">Informations de compte</h4>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nom d'utilisateur*</label>
+                            <input type="text" class="form-control" id="username" name="username" required value="{{ username|default:'' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Adresse email*</label>
+                            <input type="email" class="form-control" id="email" name="email" required value="{{ email|default:'' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password1" class="form-label">Mot de passe*</label>
+                                    <input type="password" class="form-control" id="password1" name="password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password2" class="form-label">Confirmer le mot de passe*</label>
+                            <input type="password" class="form-control" id="password2" name="password2" required>
+                        </div>
+                        
+                        <h4 class="mb-3">Informations personnelles</h4>
+                            <div class="mb-3">
+                            <label for="first_name" class="form-label">Prénom*</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required value="{{ first_name|default:'' }}">
+                            </div>
+                            <div class="mb-3">
+                            <label for="last_name" class="form-label">Nom*</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required value="{{ last_name|default:'' }}">
+                            </div>
+                            <div class="mb-3">
+                            <label for="photo" class="form-label">Photo de profil</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                            </div>
+
+                        <h4 class="mb-3">Adresse</h4>
+                            <div class="mb-3">
+                            <label for="rue" class="form-label">Rue*</label>
+                            <input type="text" class="form-control" id="rue" name="rue" required value="{{ rue|default:'' }}">
+                            </div>
+                            <div class="mb-3">
+                            <label for="numero" class="form-label">Numéro*</label>
+                            <input type="text" class="form-control" id="numero" name="numero" required value="{{ numero|default:'' }}">
+                            </div>
+                            <div class="mb-3">
+                            <label for="ville" class="form-label">Ville*</label>
+                            <input type="text" class="form-control" id="ville" name="ville" required value="{{ ville|default:'' }}">
+                            </div>
+                            <div class="mb-3">
+                            <label for="code_postal" class="form-label">Code postal*</label>
+                            <input type="text" class="form-control" id="code_postal" name="code_postal" required value="{{ code_postal|default:'' }}">
+                        </div>
+                            <div class="mb-3">
+                            <label for="pays" class="form-label">Pays</label>
+                            <input type="text" class="form-control" id="pays" name="pays" value="{{ pays|default:'République Démocratique du Congo' }}">
+                        </div>
+                        
+                        <h4 class="mb-3">Informations d'abonnement</h4>
+                        <div class="mb-3">
+                            <label for="type_abonne" class="form-label">Type d'abonné*</label>
+                            <select class="form-select" id="type_abonne" name="type_abonne" required>
+                                <option value="">Choisir un type...</option>
+                                <option value="INDIVIDUEL" {% if type_abonne == 'INDIVIDUEL' %}selected{% endif %}>Individuel</option>
+                                <option value="GROUPE" {% if type_abonne == 'GROUPE' %}selected{% endif %}>Groupe</option>
+                                <option value="INSTITUTION" {% if type_abonne == 'INSTITUTION' %}selected{% endif %}>Institution</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="raison_sociale" class="form-label">Raison sociale</label>
+                            <input type="text" class="form-control" id="raison_sociale" name="raison_sociale" value="{{ raison_sociale|default:'' }}">
+                            <small class="form-text text-muted">Requis pour les groupes et institutions</small>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="preferences_notifications" name="preferences_notifications" {% if preferences_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="preferences_notifications">Je souhaite recevoir les notifications par email</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">S'inscrire</button>
+                        </div>
+                    </form>
+                    </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Déjà inscrit ? <a href="{% url 'GestionEvenement:connexion' %}">Se connecter</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

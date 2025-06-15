@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Scanner un Billet - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Scanner un Billet</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Formulaire de scan -->
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="code_billet" class="form-label">Code du billet</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="code_billet" name="code_billet" 
+                                       placeholder="Scannez ou saisissez le code du billet" required autofocus>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-upc-scan me-2"></i>Valider
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Résultat du scan -->
+                    {% if billet %}
+                        <div class="card mb-4">
+                            <div class="card-header {% if statut == 'valide' %}bg-success{% elif statut == 'deja_utilise' or statut == 'mauvaise_date' %}bg-danger{% else %}bg-warning{% endif %} text-white">
+                                <h6 class="card-title mb-0">
+                                    {% if statut == 'valide' %}
+                                        <i class="bi bi-check-circle me-2"></i>Billet Validé
+                                    {% elif statut == 'deja_utilise' %}
+                                        <i class="bi bi-x-circle me-2"></i>Billet Déjà Utilisé
+                                    {% elif statut == 'mauvaise_date' %}
+                                        <i class="bi bi-calendar-x me-2"></i>Date Invalide
+                                    {% else %}
+                                        <i class="bi bi-exclamation-circle me-2"></i>Erreur de Validation
+                                    {% endif %}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Événement :</dt>
+                                    <dd class="col-sm-8">{{ billet.reservation.evenement.nom }}</dd>
+
+                                    <dt class="col-sm-4">Date :</dt>
+                                    <dd class="col-sm-8">{{ billet.reservation.evenement.date_debut|date:"d/m/Y H:i" }}</dd>
+
+                                    <dt class="col-sm-4">Client :</dt>
+                                    <dd class="col-sm-8">{{ billet.reservation.utilisateur.get_full_name }}</dd>
+
+                                    {% if billet.utilise %}
+                                        <dt class="col-sm-4">Utilisé le :</dt>
+                                        <dd class="col-sm-8">{{ billet.date_utilisation|date:"d/m/Y H:i" }}</dd>
+                                    {% endif %}
+                                </dl>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboard_receptionniste' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Retour au dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Focus automatique sur le champ de saisie après validation
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('code_billet').focus();
+    });
+
+    // Soumission automatique après scan (si un lecteur de code-barres est utilisé)
+    document.getElementById('code_billet').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.form.submit();
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

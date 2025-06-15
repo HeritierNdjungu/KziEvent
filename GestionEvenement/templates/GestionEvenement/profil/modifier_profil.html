@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier mon profil - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Modifier mon profil</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Photo de profil -->
+                        <div class="mb-4 text-center">
+                            {% if user.profil.photo %}
+                                <img src="{{ user.profil.photo.url }}" alt="Photo de profil" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="mb-3">
+                                    <i class="bi bi-person-circle" style="font-size: 150px;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label for="photo" class="form-label">Changer la photo</label>
+                                <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Informations personnelles -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Informations personnelles</h5>
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                </div>
+                            </div>
+
+                            <!-- Adresse -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Adresse</h5>
+                                <div class="mb-3">
+                                    <label for="rue" class="form-label">Rue</label>
+                                    <input type="text" class="form-control" id="rue" name="rue" value="{{ adresse.rue }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="numero" class="form-label">Numéro</label>
+                                    <input type="text" class="form-control" id="numero" name="numero" value="{{ adresse.numero }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ville" class="form-label">Ville</label>
+                                    <input type="text" class="form-control" id="ville" name="ville" value="{{ adresse.ville }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="code_postal" class="form-label">Code postal</label>
+                                    <input type="text" class="form-control" id="code_postal" name="code_postal" value="{{ adresse.code_postal }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pays" class="form-label">Pays</label>
+                                    <input type="text" class="form-control" id="pays" name="pays" value="{{ adresse.pays }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if abonne %}
+                        <!-- Préférences de notifications (pour les abonnés) -->
+                        <div class="mt-4">
+                            <h5 class="mb-3">Préférences de notifications</h5>
+                            <div class="mb-3">
+                                <label for="preferences_notifications" class="form-label">Comment souhaitez-vous être notifié ?</label>
+                                <select class="form-select" id="preferences_notifications" name="preferences_notifications">
+                                    <option value="email" {% if abonne.preferences_notifications == 'email' %}selected{% endif %}>Par email uniquement</option>
+                                    <option value="site" {% if abonne.preferences_notifications == 'site' %}selected{% endif %}>Sur le site uniquement</option>
+                                    <option value="tous" {% if abonne.preferences_notifications == 'tous' %}selected{% endif %}>Email et site</option>
+                                    <option value="aucun" {% if abonne.preferences_notifications == 'aucun' %}selected{% endif %}>Aucune notification</option>
+                                </select>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'dispatch_dashboard' %}" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prévisualisation de l'image avant upload
+    const photoInput = document.getElementById('photo');
+    const currentPhoto = document.querySelector('.rounded-circle');
+    
+    if (photoInput && currentPhoto) {
+        photoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    currentPhoto.src = e.target.result;
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

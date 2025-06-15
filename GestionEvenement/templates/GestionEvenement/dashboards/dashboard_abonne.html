@@ -1,0 +1,289 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Tableau de Bord Abonné - {{ block.super }}{% endblock %}
+
+{% block dashboard_title %}Tableau de Bord Abonné{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="{% url 'GestionEvenement:dispatch_dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "dispatch_dashboard" %}active{% endif %}">
+        <i class="bi bi-house-door-fill me-2"></i> Vue d'Ensemble
+    </a>
+    <a href="{% url 'GestionEvenement:dashboard_abonne' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "dashboard_abonne" %}active{% endif %}">
+        <i class="bi bi-speedometer2 me-2"></i> Mon Tableau de Bord
+    </a>
+    <a href="{% url 'GestionEvenement:profil_abonne' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "profil_abonne" %}active{% endif %}">
+        <i class="bi bi-person-fill me-2"></i> Mon Profil
+    </a>
+    <a href="{% url 'GestionEvenement:mes_reservations' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "mes_reservations" %}active{% endif %}">
+        <i class="bi bi-calendar-check-fill me-2"></i> Mes Réservations
+    </a>
+    <a href="{% url 'GestionEvenement:evenements_favoris' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "evenements_favoris" %}active{% endif %}">
+        <i class="bi bi-heart-fill me-2"></i> Événements Favoris
+    </a>
+    <a href="{% url 'GestionEvenement:mes_notifications' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "mes_notifications" %}active{% endif %}">
+        <i class="bi bi-bell-fill me-2"></i> Mes Notifications
+        {% if notifications_non_lues > 0 %}
+            <span class="badge bg-danger rounded-pill">{{ notifications_non_lues }}</span>
+        {% endif %}
+    </a>
+    <a href="{% url 'GestionEvenement:mes_paiements' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "mes_paiements" %}active{% endif %}">
+        <i class="bi bi-credit-card-fill me-2"></i> Mes Paiements
+    </a>
+    <a href="{% url 'GestionEvenement:mes_billets' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == "mes_billets" %}active{% endif %}">
+        <i class="bi bi-ticket-detailed-fill me-2"></i> Mes Billets
+    </a>
+{% endblock dashboard_nav %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, var(--accent-dark), var(--secondary-dark));">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Événements Réservés</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ reservations_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-calendar-check-fill fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="{% url 'GestionEvenement:mes_reservations' %}" class="text-white stretched-link small">Voir mes réservations <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 text-white">Billets Disponibles</h5>
+                        <p class="card-text fs-2 fw-bold text-white">{{ billets_count|default:"0" }}</p>
+                    </div>
+                    <i class="bi bi-ticket-perforated-fill fs-1 text-white opacity-50"></i>
+                </div>
+                <a href="{% url 'GestionEvenement:mes_billets' %}" class="text-white stretched-link small">Gérer mes billets <i class="bi bi-arrow-right-circle"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-hover border-0" style="background: linear-gradient(135deg, #2c3e50, #3498db);">
+            <div class="card-body">
+                <h5 class="card-title text-white mb-3">Moyens de Paiement</h5>
+                <div class="d-flex align-items-center mb-3">
+                    {% if cartes_credit %}
+                        {% for carte in cartes_credit %}
+                            <div class="me-3">
+                                <div class="payment-card p-2 rounded bg-white">
+                                    <i class="bi bi-credit-card me-2"></i>
+                                    •••• •••• •••• {{ carte.last4 }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <a href="{% url 'GestionEvenement:ajouter_carte' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-circle me-2"></i>Ajouter une carte
+                    </a>
+                </div>
+                <div class="text-white small">
+                    <i class="bi bi-shield-check me-2"></i>Vos paiements sont sécurisés
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="text-accent mb-3">Actions Rapides</h4>
+<hr class="border-secondary">
+<div class="list-group mb-4 shadow-sm">
+    <a href="{% url 'GestionEvenement:recherche_evenements' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="background-color: var(--secondary-dark); color: var(--text-light);">
+        <div>
+            <i class="bi bi-search me-2"></i> Chercher un événement
+        </div>
+        <i class="bi bi-chevron-right"></i>
+    </a>
+    <a href="{% url 'GestionEvenement:liste_evenements' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="background-color: var(--secondary-dark); color: var(--text-light);">
+        <div>
+            <i class="bi bi-calendar3 me-2"></i> Voir les événements à venir
+        </div>
+        <i class="bi bi-chevron-right"></i>
+    </a>
+    <a href="{% url 'GestionEvenement:mes_billets' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="background-color: var(--secondary-dark); color: var(--text-light);">
+        <div>
+            <i class="bi bi-ticket-perforated me-2"></i> Télécharger mes billets
+        </div>
+        <i class="bi bi-chevron-right"></i>
+    </a>
+</div>
+
+<h4 class="text-accent mb-3">Mes Prochains Événements</h4>
+<hr class="border-secondary">
+
+{% if prochains_evenements %}
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        {% for reservation in prochains_evenements %}
+            <div class="col">
+                <div class="card h-100 shadow-hover border-0">
+                    {% if reservation.evenement.image_evenement %}
+                        <img src="{{ reservation.evenement.image_evenement.url }}" class="card-img-top" alt="{{ reservation.evenement.nom }}" style="height: 150px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'GestionEvenement/images/placeholder_event.png' %}" class="card-img-top" alt="Image par défaut" style="height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-white">{{ reservation.evenement.nom }}</h5>
+                        <p class="card-text small text-light">
+                            <i class="bi bi-calendar-event text-accent me-2"></i> {{ reservation.evenement.date_debut|date:"d M Y, H:i" }}
+                        </p>
+                        <p class="card-text small text-light">
+                            <i class="bi bi-geo-alt-fill text-info me-2"></i> {{ reservation.evenement.lieu }}
+                        </p>
+                        <p class="card-text small text-light">
+                            <i class="bi bi-people-fill text-success me-2"></i> {{ reservation.nombre_places }} place(s) réservée(s)
+                        </p>
+                        <div class="mt-3">
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ reservation.get_preparation_progress }}%"></div>
+                            </div>
+                            <small class="text-light mt-1 d-block">Statut : {{ reservation.get_status_display }}</small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between">
+                        <a href="{% url 'GestionEvenement:evenement_detail' reservation.evenement.id %}" class="btn btn-sm btn-outline-light">Détails</a>
+                        <div class="btn-group">
+                            <a href="{% url 'GestionEvenement:telecharger_billet_pdf' reservation.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-download me-1"></i> Billet
+                            </a>
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'GestionEvenement:envoyer_billet_email' reservation.id %}">
+                                    <i class="bi bi-envelope me-2"></i>Envoyer par email
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'GestionEvenement:ajouter_calendrier' reservation.id %}">
+                                    <i class="bi bi-calendar-plus me-2"></i>Ajouter au calendrier
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert" role="alert" style="background-color: var(--secondary-dark); color: var(--text-light); border: 1px solid var(--accent-dark);">
+        <i class="bi bi-info-circle-fill me-2"></i> Vous n'avez pas d'événements à venir pour le moment.
+        <a href="{% url 'GestionEvenement:liste_evenements' %}" class="alert-link text-accent">Découvrez nos événements à venir</a>.
+    </div>
+{% endif %}
+
+<h4 class="text-accent mb-3">Événements Recommandés</h4>
+<hr class="border-secondary">
+
+{% if evenements_recommandes %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for evenement in evenements_recommandes %}
+            <div class="col">
+                <div class="card h-100 shadow-hover border-0">
+                    {% if evenement.image_evenement %}
+                        <img src="{{ evenement.image_evenement.url }}" class="card-img-top" alt="{{ evenement.nom }}" style="height: 120px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'GestionEvenement/images/placeholder_event.png' %}" class="card-img-top" alt="Image par défaut" style="height: 120px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ evenement.nom }}</h6>
+                        <p class="card-text small">
+                            <i class="bi bi-calendar-event text-accent me-1"></i> {{ evenement.date_debut|date:"d M Y" }}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{% url 'GestionEvenement:evenement_detail' evenement.id %}" class="btn btn-sm btn-primary w-100">Voir détails</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert" role="alert" style="background-color: var(--secondary-dark); color: var(--text-light); border: 1px solid var(--accent-dark);">
+        <i class="bi bi-info-circle-fill me-2"></i> Aucune recommandation disponible pour le moment.
+    </div>
+{% endif %}
+
+{% block extra_scripts %}
+<script>
+    // Animation des cartes au survol
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Initialisation des tooltips Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+
+<style>
+    /* Styles pour les cartes de paiement */
+    .payment-card {
+        background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+        border-radius: 8px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Amélioration des contrastes et de la lisibilité */
+    .card {
+        background-color: var(--secondary-dark);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .text-light {
+        color: #f8f9fa !important;
+    }
+
+    .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-dark);
+        border-color: var(--accent-dark);
+    }
+
+    .progress {
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    .dropdown-menu {
+        background-color: var(--secondary-dark);
+        border: 1px solid var(--accent-dark);
+    }
+
+    .dropdown-item {
+        color: var(--text-light);
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--accent-dark);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% endblock dashboard_content %}

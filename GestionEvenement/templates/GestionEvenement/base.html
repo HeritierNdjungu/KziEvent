@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KziEvent - Musée de Kolwezi{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Ajout de Owl Carousel pour les carrousels -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static "GestionEvenement/css/custom.css" %}">
+    {% block extra_head %}{% endblock %}
+    <style>
+        :root {
+            --primary-dark: #1a1a2e;
+            --secondary-dark: #16213e;
+            --accent-dark: #0f3460;
+            --text-light: #e1e1e1;
+            --accent-color: #e94560;
+            --accent-hover: #cf3e56;
+        }
+        
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--secondary-dark) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .navbar-brand {
+            color: var(--accent-color) !important;
+        }
+        
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color) !important;
+        }
+        
+        .dropdown-menu {
+            background-color: var(--secondary-dark);
+            border: 1px solid var(--accent-dark);
+        }
+        
+        .dropdown-item {
+            color: var(--text-light);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--accent-dark);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--text-light);
+            border-color: var(--text-light);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--accent-dark);
+            border-color: var(--accent-dark);
+            color: white;
+        }
+        
+        .card {
+            background-color: var(--secondary-dark);
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            color: var(--accent-color);
+        }
+        
+        .footer {
+            background-color: var(--secondary-dark) !important;
+            border-top: 1px solid var(--accent-dark) !important;
+        }
+        
+        .footer .text-muted {
+            color: var(--text-light) !important;
+        }
+        
+        /* Animation pour les éléments interactifs */
+        .btn, .card, .nav-link {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="{% url 'GestionEvenement:accueil' %}">
+                    <i class="bi bi-building-fill"></i>Kzi Event
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}" aria-current="page" href="{% url 'GestionEvenement:accueil' %}">
+                                <i class="bi bi-house-fill"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'GestionEvenement:liste_evenements' %}">
+                                <i class="bi bi-calendar-event-fill"></i> Événements
+                            </a> {# TODO: URL vers la liste des événements #}
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> {{ user.username }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+                                    <li><a class="dropdown-item" href="{% url 'GestionEvenement:dispatch_dashboard' %}"><i class="bi bi-speedometer2"></i> Mon Tableau de Bord</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person-badge"></i> Mon Profil</a></li> {# TODO: URL Profil #}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'GestionEvenement:deconnexion' %}"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'connexion' %}active{% endif %}" href="{% url 'GestionEvenement:connexion' %}">
+                                    <i class="bi bi-box-arrow-in-right"></i> Connexion
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'inscription' %}active{% endif %}" href="{% url 'GestionEvenement:inscription' %}">
+                                    <i class="bi bi-person-plus-fill"></i> Inscription
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_staff %}
+                         <li class="nav-item">
+                            <a class="nav-link" href="/admin/">
+                                <i class="bi bi-gear-fill"></i> Admin Panel
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-shrink-0 pt-5 mt-5">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show my-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer mt-auto py-3 border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="text-accent">MuséeEvent Kolwezi</h5>
+                    <p class="small">Votre destination culturelle pour des événements inoubliables au cœur de Kolwezi.</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="text-accent">Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'GestionEvenement:accueil' %}" class="text-decoration-none text-light"><i class="bi bi-chevron-right"></i> Accueil</a></li>
+                        <li><a href="{% url 'GestionEvenement:liste_evenements' %}" class="text-decoration-none text-light"><i class="bi bi-chevron-right"></i> Événements</a></li>
+                        <li><a href="#" class="text-decoration-none text-light"><i class="bi bi-chevron-right"></i> À propos</a></li>
+                        <li><a href="#" class="text-decoration-none text-light"><i class="bi bi-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-accent">Suivez-nous</h5>
+                    <div class="d-flex gap-3 fs-4">
+                        <a href="#" class="text-light"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-light"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3 border-secondary">
+            <div class="text-center">
+                <span class="text-light">&copy; {% now "Y" %} MuséeEvent Kolwezi. Tous droits réservés.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

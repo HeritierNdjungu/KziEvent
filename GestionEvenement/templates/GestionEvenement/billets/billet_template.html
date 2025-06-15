@@ -1,0 +1,192 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block title %}Billet - {{ reservation.evenement.nom }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    @page {
+        size: A4;
+        margin: 1cm;
+    }
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        color: #333;
+        background-color: #fff;
+    }
+    .billet-container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #16213e, #0f3460);
+        color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .billet-header {
+        text-align: center;
+        border-bottom: 2px solid #e94560;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .billet-logo {
+        max-width: 150px;
+        margin-bottom: 10px;
+    }
+    .billet-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #e94560;
+        margin: 0;
+    }
+    .billet-subtitle {
+        font-size: 16px;
+        color: #e1e1e1;
+        margin: 5px 0 0;
+    }
+    .billet-content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .billet-info {
+        flex: 1;
+        min-width: 60%;
+    }
+    .billet-qr {
+        flex: 1;
+        min-width: 30%;
+        text-align: center;
+    }
+    .billet-qr img {
+        max-width: 150px;
+        margin: 0 auto;
+    }
+    .info-group {
+        margin-bottom: 15px;
+    }
+    .info-label {
+        font-size: 12px;
+        color: #e94560;
+        margin-bottom: 3px;
+    }
+    .info-value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+    }
+    .billet-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e94560;
+        font-size: 12px;
+        color: #e1e1e1;
+    }
+    .billet-id {
+        font-size: 10px;
+        color: #e1e1e1;
+        text-align: right;
+        margin-top: 10px;
+    }
+    @media print {
+        .no-print {
+            display: none;
+        }
+        .billet-container {
+            box-shadow: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 mb-4 no-print">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <button onclick="window.print()" class="btn btn-primary mb-3">
+                <i class="bi bi-printer"></i> Imprimer le billet
+            </button>
+            <a href="{% url 'telecharger_billet_pdf' reservation.id %}" class="btn btn-success mb-3">
+                <i class="bi bi-download"></i> Télécharger en PDF
+            </a>
+        </div>
+        
+        <div class="col-12">
+            <div class="billet-container">
+                <div class="billet-header">
+                    <img src="{% static 'GestionEvenement/images/logo_musee.png' %}" alt="Logo Musée" class="billet-logo">
+                    <h1 class="billet-title">BILLET D'ENTRÉE</h1>
+                    <p class="billet-subtitle">MuséeEvent Kolwezi</p>
+                </div>
+                
+                <div class="billet-content">
+                    <div class="billet-info">
+                        <div class="info-group">
+                            <div class="info-label">ÉVÉNEMENT</div>
+                            <div class="info-value">{{ reservation.evenement.nom }}</div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <div class="info-label">NOM DU VISITEUR</div>
+                            <div class="info-value">{{ reservation.abonne.user.get_full_name|default:reservation.abonne.user.username }}</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="info-group">
+                                    <div class="info-label">DATE</div>
+                                    <div class="info-value">{{ reservation.evenement.date_debut|date:"d/m/Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-group">
+                                    <div class="info-label">HEURE</div>
+                                    <div class="info-value">{{ reservation.evenement.date_debut|date:"H:i" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="info-group">
+                                    <div class="info-label">LIEU</div>
+                                    <div class="info-value">{{ reservation.evenement.lieu }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-group">
+                                    <div class="info-label">NOMBRE DE PLACES</div>
+                                    <div class="info-value">{{ reservation.nombre_places }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <div class="info-label">PRIX TOTAL</div>
+                            <div class="info-value">{{ reservation.montant_total }} $</div>
+                        </div>
+                    </div>
+                    
+                    <div class="billet-qr">
+                        <img src="{{ qr_code }}" alt="QR Code">
+                        <p class="mt-2">Scannez ce code à l'entrée</p>
+                    </div>
+                </div>
+                
+                <div class="billet-footer">
+                    <p>Ce billet est personnel et non remboursable. Veuillez vous présenter 15 minutes avant le début de l'événement.</p>
+                    <p>Pour toute question, contactez-nous à info@museeevent-kolwezi.com</p>
+                </div>
+                
+                <div class="billet-id">
+                    Réservation #{{ reservation.id }} | Émis le {{ date_emission|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

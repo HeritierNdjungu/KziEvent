@@ -1,0 +1,182 @@
+{% extends "GestionEvenement/dashboards/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Statistiques de Communication - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css">
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 text-accent">Statistiques de Communication</h1>
+        <div class="btn-toolbar">
+            <button class="btn btn-outline-light me-2" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Imprimer
+            </button>
+            <button class="btn btn-outline-light" onclick="exportToExcel()">
+                <i class="bi bi-file-excel me-2"></i>Exporter
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Carte des statistiques générales -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-body">
+                    <h5 class="card-title text-accent mb-4">Aperçu Général</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-light">Total Notifications</span>
+                        <span class="text-accent fw-bold">{{ total_notifications }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-light">Taux d'ouverture</span>
+                        <span class="text-accent fw-bold">{{ taux_ouverture }}%</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-light">Abonnés actifs</span>
+                        <span class="text-accent fw-bold">{{ abonnes_actifs }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des notifications par mois -->
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-body">
+                    <h5 class="card-title text-accent mb-4">Notifications par Mois</h5>
+                    <canvas id="notificationsChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des taux d'engagement -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-body">
+                    <h5 class="card-title text-accent mb-4">Taux d'Engagement</h5>
+                    <canvas id="engagementChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des notifications récentes -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100" style="background-color: var(--secondary-dark); border: none;">
+                <div class="card-body">
+                    <h5 class="card-title text-accent mb-4">Notifications Récentes</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="text-light">
+                                    <th>Titre</th>
+                                    <th>Date</th>
+                                    <th>Taux</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for notification in notifications_recentes %}
+                                <tr class="text-light">
+                                    <td>{{ notification.titre }}</td>
+                                    <td>{{ notification.date_envoi|date:"d M" }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar bg-accent" role="progressbar" 
+                                                 style="width: {{ notification.taux_ouverture }}%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphique des notifications par mois
+    const notificationsCtx = document.getElementById('notificationsChart').getContext('2d');
+    new Chart(notificationsCtx, {
+        type: 'line',
+        data: {
+            labels: {{ mois|safe }},
+            datasets: [{
+                label: 'Notifications envoyées',
+                data: {{ notifications_par_mois|safe }},
+                borderColor: '#6c5ce7',
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#fff'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff'
+                    }
+                }
+            }
+        }
+    });
+
+    // Graphique des taux d'engagement
+    const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Ouvertes', 'Non ouvertes'],
+            datasets: [{
+                data: [{{ taux_ouverture }}, {{ 100|sub:taux_ouverture }}],
+                backgroundColor: ['#6c5ce7', '#2d3436']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#fff'
+                    }
+                }
+            }
+        }
+    });
+});
+
+function exportToExcel() {
+    // Implémentation de l'export Excel
+    alert('Fonctionnalité d\'export à implémenter');
+}
+</script>
+{% endblock %} 

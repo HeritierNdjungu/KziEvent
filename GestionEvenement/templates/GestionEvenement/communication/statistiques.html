@@ -1,0 +1,140 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+{% load extra_filters %}
+
+{% block title %}Statistiques de Communication - {{ block.super }}{% endblock %}
+
+{% block content %}
+<style>
+body, .card, .card-header, .card-body, .table, .table th, .table td, .badge, .text-dark, .text-primary, .text-success, .text-warning, .text-light, .text-white {
+    color: #fff !important;
+    background-color: #222 !important;
+    border-color: #fff !important;
+}
+
+.bg-primary, .bg-success, .bg-warning, .bg-light, .bg-white, .bg-dark {
+    background-color: #222 !important;
+    color: #fff !important;
+}
+
+.table th, .table td {
+    border-color: #fff !important;
+}
+
+input, select, textarea {
+    background-color: #222 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Statistiques de Communication</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="row">
+                        <!-- Statistiques des événements -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="card-title mb-0">Événements</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total des événements :</span>
+                                        <span class="badge bg-primary">{{ total_evenements }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Événements publiés :</span>
+                                        <span class="badge bg-success">{{ evenements_publies }}</span>
+                                    </div>
+                                    {% if total_evenements > 0 %}
+                                        <div class="progress mt-3">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ evenements_publies|div:total_evenements|mul:100 }}%">
+                                                {{ evenements_publies|div:total_evenements|mul:100|floatformat:1 }}%
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques des commentaires -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">Commentaires</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total des commentaires :</span>
+                                        <span class="badge bg-primary">{{ total_commentaires }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Commentaires modérés :</span>
+                                        <span class="badge bg-success">{{ commentaires_moderes }}</span>
+                                    </div>
+                                    {% if total_commentaires > 0 %}
+                                        <div class="progress mt-3">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ commentaires_moderes|div:total_commentaires|mul:100 }}%">
+                                                {{ commentaires_moderes|div:total_commentaires|mul:100|floatformat:1 }}%
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques des réservations -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="card-title mb-0">Réservations</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total des réservations :</span>
+                                        <span class="badge bg-primary">{{ total_reservations }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Réservations confirmées :</span>
+                                        <span class="badge bg-success">{{ reservations_confirmees }}</span>
+                                    </div>
+                                    {% if total_reservations > 0 %}
+                                        <div class="progress mt-3">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ reservations_confirmees|div:total_reservations|mul:100 }}%">
+                                                {{ reservations_confirmees|div:total_reservations|mul:100|floatformat:1 }}%
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="{% url 'GestionEvenement:dashboard_communication' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Retour au dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

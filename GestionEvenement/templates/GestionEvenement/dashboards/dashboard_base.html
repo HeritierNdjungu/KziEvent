@@ -1,0 +1,75 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse" style="min-height: calc(100vh - 56px);">
+            <div class="position-sticky pt-3">
+                <h5 class="text-white px-3 pb-3 border-bottom">{% block dashboard_title %}Dashboard{% endblock %}</h5>
+                <div class="list-group list-group-flush">
+                    {% block dashboard_nav %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4">
+            {% block dashboard_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+{% block extra_styles %}
+<style>
+    :root {
+        --accent-color: #3498db;
+        --accent-dark: #2980b9;
+        --secondary-dark: #2c3e50;
+        --text-light: #ecf0f1;
+    }
+
+    .sidebar {
+        background-color: var(--secondary-dark) !important;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .list-group-item {
+        background-color: transparent;
+        border-color: rgba(255,255,255,0.1);
+        color: var(--text-light);
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: var(--accent-dark);
+        color: white;
+    }
+
+    .list-group-item.active {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .shadow-hover {
+        transition: all 0.3s ease;
+    }
+
+    .shadow-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .text-accent {
+        color: var(--accent-color) !important;
+    }
+
+    .bg-accent {
+        background-color: var(--accent-color) !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}{% endblock %}
+{% endblock content %}

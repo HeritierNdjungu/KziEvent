@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Rapport Journalier - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Rapport Journalier du {{ date|date:"d/m/Y" }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Résumé -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Entrées</h6>
+                                    <p class="display-4">{{ total_entrees }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Recettes</h6>
+                                    <p class="display-4">{{ total_recettes|floatformat:2 }} €</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Événements du jour -->
+                    <h5 class="mb-3">Événements du jour</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Horaire</th>
+                                    <th>Lieu</th>
+                                    <th>Participants</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evenement in evenements %}
+                                <tr>
+                                    <td>{{ evenement.nom }}</td>
+                                    <td>{{ evenement.date_debut|time:"H:i" }}</td>
+                                    <td>{{ evenement.lieu }}</td>
+                                    <td>{{ evenement.reservations.count }}/{{ evenement.capacite }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucun événement aujourd'hui</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Réservations -->
+                    <h5 class="mb-3">Réservations du jour</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Client</th>
+                                    <th>Événement</th>
+                                    <th>Billets</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reservation in reservations %}
+                                <tr>
+                                    <td>#{{ reservation.id }}</td>
+                                    <td>{{ reservation.utilisateur.get_full_name }}</td>
+                                    <td>{{ reservation.evenement.nom }}</td>
+                                    <td>{{ reservation.nombre_billets }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ reservation.statut|lower }}">
+                                            {{ reservation.get_statut_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucune réservation aujourd'hui</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paiements -->
+                    <h5 class="mb-3">Paiements du jour</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Client</th>
+                                    <th>Montant</th>
+                                    <th>Mode</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements %}
+                                <tr>
+                                    <td>#{{ paiement.id }}</td>
+                                    <td>{{ paiement.reservation.utilisateur.get_full_name }}</td>
+                                    <td>{{ paiement.montant }} €</td>
+                                    <td>{{ paiement.get_mode_paiement_display }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ paiement.statut|lower }}">
+                                            {{ paiement.get_statut_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucun paiement aujourd'hui</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{% url 'dashboard_receptionniste' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Retour au dashboard
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary ms-2">
+                            <i class="bi bi-printer me-2"></i>Imprimer le rapport
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

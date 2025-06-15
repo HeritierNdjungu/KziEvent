@@ -1,0 +1,112 @@
+/* Styles personnalisés pour MuséeEvent */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa; /* Gris clair pour le fond */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.hero-section {
+    color: white;
+    /* Une image de fond plus neutre ou thématique musée serait bien */
+    /* background: url("../images/musee_hero_bg.jpg") no-repeat center center; */
+    /* background-size: cover; */
+    background-color: #343a40; /* Fallback si l_image ne charge pas */
+    padding: 4rem 2rem;
+}
+
+.hero-section h1, .hero-section p {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.card-title {
+    color: #0056b3; /* Bleu primaire pour les titres de cartes */
+}
+
+.card.shadow-hover:hover {
+    transition: box-shadow .2s ease-in-out, transform .2s ease-in-out;
+    box-shadow: 0 .75rem 1.5rem rgba(0,0,0,.175)!important;
+    transform: translateY(-5px);
+}
+
+.footer {
+    font-size: 0.9rem;
+}
+
+/* Style pour les formulaires */
+.form-control-lg {
+    padding: .75rem 1.25rem;
+    font-size: 1.1rem;
+}
+
+.form-label.fs-5 {
+    font-weight: 500;
+    margin-bottom: .5rem;
+}
+
+.card-header.bg-primary {
+    background-color: #0056b3 !important; /* Un bleu plus soutenu */
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-primary:hover {
+    background-color: #004494;
+    border-color: #004494;
+}
+
+.alert-heading {
+    font-weight: 500;
+}
+
+/* Dashboards */
+.list-group-item.active {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.list-group-item-action:hover, .list-group-item-action:focus {
+    background-color: #e9ecef;
+}
+
+.table th {
+    font-weight: 600;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+/* Amélioration des placeholders d_images */
+.card-img-top {
+    background-color: #e9ecef; /* Couleur de fond pour les images placeholder */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.rounded-circle.bg-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: white;
+}
+

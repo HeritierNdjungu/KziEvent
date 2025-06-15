@@ -1,0 +1,137 @@
+{% extends "GestionEvenement/base.html" %}
+{% load static %}
+
+{% block title %}{{ evenement.nom }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm" style="background-color: var(--secondary-dark); border: none;">
+                {% if evenement.image %}
+                <img src="{{ evenement.image.url }}" class="card-img-top" alt="{{ evenement.nom }}" style="height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h1 class="h3 text-white mb-0">{{ evenement.nom }}</h1>
+                        <span class="badge {% if evenement.statut == 'PUBLIE' %}bg-success{% elif evenement.statut == 'BROUILLON' %}bg-warning{% elif evenement.statut == 'ANNULE' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ evenement.get_statut_display }}
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-light">{{ evenement.description }}</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-calendar-event me-2"></i>Dates</h5>
+                                    <p class="card-text">
+                                        Début : {{ evenement.date_debut|date:"d M Y, H:i" }}<br>
+                                        Fin : {{ evenement.date_fin|date:"d M Y, H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-geo-alt me-2"></i>Lieu</h5>
+                                    <p class="card-text">{{ evenement.lieu }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-dark text-light">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-people me-2"></i>Capacité</h5>
+                                    <p class="card-text">
+                                        Places disponibles : {{ places_disponibles }}/{{ evenement.capacite }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-dark text-light">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-tag me-2"></i>Prix</h5>
+                                    <p class="card-text">{{ evenement.prix }} USD</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-dark text-light">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-bookmark me-2"></i>Catégorie</h5>
+                                    <p class="card-text">{{ evenement.categorie.nom_categorie|default:"Non catégorisé" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if est_abonne and not a_reserve and evenement.statut == 'PUBLIE' and places_disponibles > 0 %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'GestionEvenement:reserver_evenement' evenement.pk %}" class="btn btn-primary">
+                            <i class="bi bi-ticket-perforated me-2"></i>Réserver
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if est_charge_programmation and peut_modifier %}
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'GestionEvenement:modifier_evenement' evenement.pk %}" class="btn btn-warning">
+                            <i class="bi bi-pencil me-2"></i>Modifier
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if est_charge_communication and peut_publier %}
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'GestionEvenement:publier_evenement' evenement.pk %}" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Publier
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <h4 class="text-white mb-3">Commentaires</h4>
+                        {% if commentaires %}
+                            {% for commentaire in commentaires %}
+                                <div class="card bg-dark text-light mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                {{ commentaire.abonne.user.get_full_name|default:commentaire.abonne.user.username }}
+                                            </h6>
+                                            <small class="text-muted">{{ commentaire.date_commentaire|date:"d M Y, H:i" }}</small>
+                                        </div>
+                                        <p class="card-text">{{ commentaire.texte }}</p>
+                                        {% if commentaire.note %}
+                                            <div class="text-warning">
+                                                {% for i in "12345"|make_list %}
+                                                    {% if forloop.counter <= commentaire.note %}
+                                                        <i class="bi bi-star-fill"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-light">Aucun commentaire pour le moment.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
